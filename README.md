@@ -8,8 +8,7 @@ Spatial transcriptomics (ST) technologies have transformed our comprehension of 
 
 ## Environment
 
-The required environment has been packaged in the [`requirements.txt`](./requirements.txt) file.    
-Please run the following command to install.
+The required environment has been packaged in the [`requirements.txt`](./requirements.txt) file. Please run the following command to install.
 
 ```commandline
 git clone https://github.com/QSong-github/SpaIM
@@ -19,7 +18,7 @@ pip install -r requirements.txt
 
 ## Datasets
 
-- You can also download all datasets from [here](https://www.synapse.org/#!Synapse:syn52503858/files/)
+All datasets used in this study are publicly available. Data sources and details are provided in Supplemental Table 1. 
 
 ## Trained models
 
