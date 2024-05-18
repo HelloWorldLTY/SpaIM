@@ -43,7 +43,7 @@ The datasets structure should be as follows:
     |-- nano13
 ```
 
-## SpaIM Training and testing
+## SpaIM Training and Testing
 
 ```
 ./run_SpaIM.sh
