@@ -18,10 +18,11 @@ pip install -r requirements.txt
 
 ## Datasets
 
-All datasets used in this study are publicly available. Data sources and details are provided in [`Supplemental_Table_1`](./Supplemental_Table_1.xlsx). 
+All datasets used in this study are publicly available. 
 
-- 
-- The datasets of NanoString CosMx SMI are available from [https://nanostring.com/products/cosmx-spatial-molecular-imager/nsclc-ffpe-dataset/](https://nanostring.com/products/cosmx-spatial-molecular-imager/nsclc-ffpe-dataset/). 
+- Data sources and details are provided in [`Supplemental_Table_1`](./Supplemental_Table_1.xlsx). 
+
+- The NanoString CosMx SMI datasets are available from [https://nanostring.com/products/cosmx-spatial-molecular-imager/nsclc-ffpe-dataset/](https://nanostring.com/products/cosmx-spatial-molecular-imager/nsclc-ffpe-dataset/). 
 
 ## Trained models
 
