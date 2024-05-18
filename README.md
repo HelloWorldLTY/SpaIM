@@ -24,13 +24,30 @@ All datasets used in this study are publicly available.
 
 - The NanoString CosMx SMI datasets are available from [https://nanostring.com/products/cosmx-spatial-molecular-imager/nsclc-ffpe-dataset/](https://nanostring.com/products/cosmx-spatial-molecular-imager/nsclc-ffpe-dataset/). 
 
-## SpaIM Training
+The datasets structure should be as follows:
+```
+|-- dataset
+    |-- benchmark_datasets
+        |-- Dataset1
+        |-- Dataset2
+        |-- ......
+        |-- Dataset44
+        |-- Dataset45
+    |-- nano5-1
+    |-- nano5-2
+    |-- nano5-3
+    |-- nano5-6
+    |-- nano9-1
+    |-- nano9-2
+    |-- nano12
+    |-- nano13
+```
+
+## SpaIM Training and testing
 
 ```
 ./run_SpaIM.sh
 ```
-
-
 
 
 
