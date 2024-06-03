@@ -6,7 +6,7 @@ import scanpy as sc
 class Options():
     def __init__(self):
         self.parser = argparse.ArgumentParser()
-        self.parser.add_argument('--root', type=str, default='/home/zy/libo/SpaIM/dataset')
+        self.parser.add_argument('--root', type=str, default='./dataset')
         self.parser.add_argument('--dataset_name', type=str, default='Dataset1')
         self.parser.add_argument('--kfold', type=int, default=0)
         self.parser.add_argument('--batch_size', type=int, default=500)
