@@ -48,7 +48,9 @@ The datasets structure should be as follows:
 ```
 ./run_SpaIM.sh
 ```
+This command simultaneously trains both the benchmark and nano datasets. By modifying this file, you can perform individual training for each dataset. 
 
+Upon completion, the model and results are available in the defined folders (./checkpoint_SpaIM for the benchmark, ./results/checkpoint_SpaIM for the nano).
 
 
 
