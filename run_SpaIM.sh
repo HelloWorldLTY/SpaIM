@@ -17,21 +17,19 @@ do
 done
 
 
-# # exit()
-
-
 # Train nanostring dataset
 val=0
 lr=1e-3
 ep=300
+root='dataset/'
 
 for ds in 'nano5-1' 'nano5-2' 'nano5-3' 'nano6'  'nano9-1' 'nano9-2' 'nano12' 'nano13'
 do
     echo "Current dataset: $ds"
-    sp="results/$ds/SpaIM"
+    ps="results/$sp"
 
     for kfold in {0..10}
     do
-        python3 main.py --kfold $kfold --val_only $val --save_path $sp --lr $lr --epochs $ep --dataset_name $ds
+        python3 main.py --kfold $kfold --root $root --val_only $val --save_path $ps --lr $lr --epochs $ep --dataset_name $ds
     done
 done
