@@ -13,7 +13,7 @@ from utils import seed_everything, CalculateMeteics
 
 
 # define model
-from model.SpaIM import ImputeModule
+from SpaIM import ImputeModule
 
 def val(opt):
     # valdataset = ImputationDataset(opt, istrain='val')
