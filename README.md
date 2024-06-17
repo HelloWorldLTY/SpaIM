@@ -53,10 +53,10 @@ The datasets structure should be as follows:
 ./run_SpaIM.sh
 ```
 
-The trained model and metric results are available in the defined folders:
+The trained models and metric results are available in the defined folders:
 ```
-./checkpoint_SpaIM for the benchmark datasets;
-./results/checkpoint_SpaIM for the nano datasets.
+./checkpoint_SpaIM  # for benchmark datasets
+./results/checkpoint_SpaIM   # for nano datasets
 ```
 
 
