@@ -39,7 +39,7 @@ The datasets structure should be as follows:
     |-- nano5-1
     |-- nano5-2
     |-- nano5-3
-    |-- nano5-6
+    |-- nano6
     |-- nano9-1
     |-- nano9-2
     |-- nano12
