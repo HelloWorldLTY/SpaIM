@@ -30,16 +30,8 @@ The datasets structure should be as follows:
         |-- Dataset1
         |-- Dataset2
         |-- ......
-        |-- Dataset44
-        |-- Dataset45
-    |-- nano5-1
-    |-- nano5-2
-    |-- nano5-3
-    |-- nano6
-    |-- nano9-1
-    |-- nano9-2
-    |-- nano12
-    |-- nano13
+        |-- Dataset52
+        |-- Dataset53
 ```
 
 ## SpaIM Training and Testing
