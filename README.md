@@ -48,4 +48,7 @@ The trained models and metric results are available in the defined folders:
 ```
 
 
+## Acknowledgments
+
+Our code is based on the [neural-style](https://github.com/jcjohnson/neural-style). Special thanks to the authors and contributors for their invaluable work.
 
