@@ -12,7 +12,8 @@ The required environment has been packaged in the [`requirements.txt`](./require
 ```commandline
 git clone https://github.com/QSong-github/SpaIM
 cd SpaIM
-pip install -r requirements.txt
+conda env create -f environment.yaml
+conda activate SpaIM
 ```
 
 ## Datasets
