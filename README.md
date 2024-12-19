@@ -7,7 +7,7 @@ To accurately impute unmeasured gene expressions in spatial transcriptomics (ST)
 
 ## Environment
 
-The required environment has been packaged in the [`requirements.txt`](./requirements.txt) file. Please run the following command to install.
+Please run the following command to install.
 
 ```commandline
 git clone https://github.com/QSong-github/SpaIM
