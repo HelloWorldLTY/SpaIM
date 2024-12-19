@@ -11,7 +11,7 @@ do
     val=0
     for kfold in {0..9}
     do
-        python3 main_benchmark.py --kfold $kfold --dataset_name $ds --val_only $val --save_path $sp --epochs $ep
+        python3 main.py --kfold $kfold --dataset_name $ds --val_only $val --save_path $sp --epochs $ep
     done
     python3 eval_results.py --dataset_name $ds --save_path $sp
 done

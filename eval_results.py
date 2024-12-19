@@ -2,7 +2,7 @@ from options import Options
 import os 
 import numpy as np
 import pandas as pd
-import torch
+# import torch
 from utils import CalculateMeteics
 
 if __name__ == '__main__':
@@ -22,4 +22,4 @@ if __name__ == '__main__':
 
     evaluate = CalculateMeteics(raw_all, impute_all, root, 'None', 'SpaImputation')
     acc = evaluate.compute_all(K='none')
-    print(acc.T['PCC'].mean())
+    print("PCC: ", acc.T['PCC'].mean())

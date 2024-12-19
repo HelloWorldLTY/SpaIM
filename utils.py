@@ -111,9 +111,11 @@ class CalculateMeteics:
             impute = scale_max(impute)
         else:
             print ('Please note you do not scale data by scale max')
+        print(raw.shape, impute.shape) # (92614, 1890)
         if raw.shape[0] == impute.shape[0]:
             result = pd.DataFrame()
             for label in raw.columns:
+                # print(label) # SERPINA3  should be single column, it is gene
                 if label not in impute.columns:
                     ssim = 0
                 else:
@@ -121,7 +123,9 @@ class CalculateMeteics:
                     impute_col = impute.loc[:,label]
                     impute_col = impute_col.fillna(1e-20)
                     raw_col = raw_col.fillna(1e-20)
+                    # print("PPP",raw_col.shape, impute_col.shape) # PPP (92614, 5) should be (92614,)
                     M = [raw_col.max(),impute_col.max()][raw_col.max()>impute_col.max()]
+                    # print("PPP",raw_col.shape, impute_col.shape)
                     raw_col_2 = np.array(raw_col)
                     raw_col_2 = raw_col_2.reshape(raw_col_2.shape[0],1)
                     impute_col_2 = np.array(impute_col)
@@ -145,6 +149,8 @@ class CalculateMeteics:
                     impute_col = impute.loc[:,label]
                     impute_col = impute_col.fillna(1e-20)
                     raw_col = raw_col.fillna(1e-20)
+                    # print('raw_col',raw_col)
+                    # print('impute_col',impute_col)
                     try:
                         pearsonr, _ = st.pearsonr(raw_col,impute_col)
                     except:
@@ -214,17 +220,28 @@ class CalculateMeteics:
         raw = self.raw_count
         impute = self.impute_count
         impute[impute < 0] = 0
+
+        # print(impute.index)
+        # print(raw.index)
+
         prefix = self.prefix
+        # print('SSIM')
         SSIM = self.SSIM(raw,impute)
+        # exit()
+        # print('PCC')
         Pearson = self.PCC(raw, impute)
+        # print('Pearson', Pearson)  # [1 rows x 117 columns], 展示每一个gene（177） 的PCC指数
         JS = self.JS(raw, impute)
+        # print('RMSE')
         RMSE = self.RMSE(raw, impute)
         
         result_all = pd.concat([Pearson, SSIM, RMSE, JS],axis=0)
+#         result_all = pd.concat([JS],axis=0)
         if K == 'none':
             save_path = os.path.join(prefix, self.name+"_Metrics.txt")
         else:
             save_path = os.path.join(prefix, self.name+"_Metrics_%d.txt"%(K))
+        print(save_path)
         result_all.T.to_csv(save_path, sep='\t', header = 1, index = 1)
         self.accuracy = result_all
         return result_all
