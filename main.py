@@ -9,7 +9,7 @@ import torch
 from options import Options
 from dataset import ImputationDataset
 from tqdm import tqdm
-from model.SpaIM import ImputeModule
+from SpaIM import ImputeModule
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
