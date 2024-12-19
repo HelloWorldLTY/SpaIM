@@ -20,9 +20,9 @@ conda activate SpaIM
 
 All datasets used in this study are publicly available. 
 
-- Data sources and details are provided in [`Supplemental_Table_1`](./Supplemental_Table_1.xlsx). 
+- Data sources and details are provided in [`Supplemental_Table_1`](./Supplemental_Table_1.xlsx). After the data was downloaded, follow the processing flow in [get_adata_cluster.py](get_adata_cluster.py) to analyse it for clustering.
 
-- The NanoString CosMx SMI datasets are available from [https://nanostring.com/products/cosmx-spatial-molecular-imager/nsclc-ffpe-dataset/](https://nanostring.com/products/cosmx-spatial-molecular-imager/nsclc-ffpe-dataset/). 
+- Example processed dataset 1 can be downloaded at [synapse](https://www.synapse.org/Synapse:syn64421788).
 
 The datasets structure should be as follows:
 ```
@@ -36,15 +36,15 @@ The datasets structure should be as follows:
 
 ## SpaIM Training and Testing
 
+Train all 53 datasets with one command
 ```
-# Train both the benchmark and nano datasets.
+chmod +x ./*
 ./run_SpaIM.sh
 ```
 
 The trained models and metric results are available in the defined folders:
 ```
-./checkpoint_SpaIM  # for benchmark datasets
-./results/checkpoint_SpaIM   # for nano datasets
+./SpaIM_results  # for benchmark datasets
 ```
 
 
