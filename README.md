@@ -26,12 +26,11 @@ All datasets used in this study are publicly available.
 The datasets structure should be as follows:
 ```
 |-- dataset
-    |-- benchmark_datasets
-        |-- Dataset1
-        |-- Dataset2
-        |-- ......
-        |-- Dataset52
-        |-- Dataset53
+    |-- Dataset1
+    |-- Dataset2
+    |-- ......
+    |-- Dataset52
+    |-- Dataset53
 ```
 
 ## SpaIM Training and Testing
