@@ -11,7 +11,16 @@ class ImputationDataset(Dataset):
         self.seq_data = self.load_data(opt.seq_data)  # loading 测序数据
         self.spa_data = self.load_data(opt.spa_data)
 
-        self.seq_cluster = self.seq_data.obs['leiden'].cat.codes.values
+        # self.seq_cluster = self.seq_data.obs['leiden'].cat.codes.values
+        if 'leiden' in opt.cluster:
+            self.seq_cluster = self.seq_data.obs[opt.cluster].cat.codes.values
+        elif opt.cluster == 'annotate':
+            # print('use annotation')
+            # print(seq_data.obs.keys())  # Index(['leiden', 'n_genes'], dtype='object')
+            # self.seq_cluster = seq_data.obs['leiden'].cat.codes.values   # Benchmark
+            self.seq_cluster = self.seq_data.obs['merge_cell_type'].cat.codes.values  # 对应的是nano的设置，需要改 seq_data 的数据源
+        else:
+            self.seq_cluster = [1]
         self.style_dim = opt.style_dim
         self.istrain = istrain
 
