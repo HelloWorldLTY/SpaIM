@@ -20,8 +20,8 @@ dataset = 'Dataset1'
 
 
 # 选择对应数据集
-st_path = f'../dataset/{dataset}/Insitu_count.h5ad'
-sc_path = f'../dataset/{dataset}/scRNA_count_cluster.h5ad'
+st_path = f'./dataset/{dataset}/Insitu_count.h5ad'
+sc_path = f'./dataset/{dataset}/scRNA_count_cluster.h5ad'
 
 ST_adata = sc.read(st_path)
 SC_adata = sc.read(sc_path)
