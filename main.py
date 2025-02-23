@@ -10,6 +10,7 @@ from options import Options
 from dataset import ImputationDataset
 from tqdm import tqdm
 from SpaIM import ImputeModule
+from utils import *
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '0'
 
@@ -58,11 +59,9 @@ def val(opt):
     df2 = pd.DataFrame(input_result, index=cell_names, columns=gene_names)
     df2.to_pickle(os.path.join(opt.save_path, 'input_result_%d.pkl'%(opt.kfold)))
 
-    # np.save(os.path.join(opt.save_path, 'impute_result_%d.npy'%(opt.kfold)), eval_result)
-    # np.save(os.path.join(opt.save_path, 'input_result_%d.npy'%(opt.kfold)), input_result)
-    # evaluate = CalculateMeteics(df2, df1, opt.save_path, 'None', 'SpaImputation')
-    # acc = evaluate.compute_all(i)
-    # print(acc.T['PCC'].mean(), acc.T['JS'].mean())
+    evaluate = CalculateMeteics(df2, df1, opt.save_path, 'None', 'SpaImputation')
+    acc = evaluate.compute_all(opt.kfold)
+    print('PCC = ', acc.T['PCC'].mean())
 
 def Data_augmentation(data1, data2, data3, times=2, zero_fraction=0.1):
     """

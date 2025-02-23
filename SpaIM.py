@@ -10,6 +10,7 @@ def gram_matrix(feat):
     G = torch.mm(feat, feat.t()) # b * d * d * b
     return G.div(b * d)
 
+
 class mlp_simple(nn.Module):
     def __init__(self, input_dim, hidden_dim):
         super().__init__()
