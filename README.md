@@ -24,7 +24,7 @@ All datasets used in this study are publicly available.
 
 - Data sources and details are provided in [`Supplemental_Table_1`](./Supplemental_Table_1.xlsx). After the data was downloaded, follow the processing flow in [get_adata_cluster.py](get_adata_cluster.py) to analyse it for clustering.
 
-- All processed datasets and example datasets 1 can be downloaded at [synapse](https://www.synapse.org/Synapse:syn64421787/files/) or [zenodo](https://zenodo.org/records/14741028).
+- All processed datasets and example datasets 1 can be downloaded at [Zenodo](https://zenodo.org/records/14741028) and [Synapse](https://www.synapse.org/Synapse:syn64421787/files/).
 
 The datasets structure should be as follows:
 ```
