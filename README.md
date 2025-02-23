@@ -22,7 +22,7 @@ All datasets used in this study are publicly available.
 
 - Data sources and details are provided in [`Supplemental_Table_1`](./Supplemental_Table_1.xlsx). After the data was downloaded, follow the processing flow in [get_adata_cluster.py](get_adata_cluster.py) to analyse it for clustering.
 
-- Example processed datasets 1 and 2 can be downloaded at [synapse](https://www.synapse.org/Synapse:syn64421787/files/).
+- All processed datasets and example datasets 1 can be downloaded at [synapse](https://www.synapse.org/Synapse:syn64421787/files/) or [zenodo](https://zenodo.org/uploads/14741028).
 
 The datasets structure should be as follows:
 ```
@@ -44,9 +44,15 @@ chmod +x ./*
 
 The trained models and metric results are available in the defined folders:
 ```
-./SpaIM_results  # for benchmark datasets
+./SpaIM_results/Dataset1/  # for benchmark datasets
 ```
 
+## SpaIM Inference
+
+```
+python test_impiutation.py
+```
+The inference results will exist in './SpaIM_results/Dataset1/impute_sc_result_%d.pkl'.
 
 ## Acknowledgments
 
