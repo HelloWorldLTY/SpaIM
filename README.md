@@ -9,7 +9,7 @@ We introduce SpaIM, a novel style transfer learning model that leverages scRNA-s
 
 ## Environment
 
-Please run the following command to install.
+To get started with SpaIM, please follow the steps below to set up your environment:
 
 ```commandline
 git clone https://github.com/QSong-github/SpaIM
@@ -22,11 +22,11 @@ conda activate SpaIM
 
 All datasets used in this study are publicly available. 
 
-- Data sources and details are provided in [`Supplemental_Table_1`](./Supplemental_Table_1.xlsx). After the data was downloaded, follow the processing flow in [get_adata_cluster.py](get_adata_cluster.py) to analyse it for clustering.
+- Data sources and details are provided in [`Supplemental_Table_1`](./Supplemental_Table_1.xlsx). After downloading the data, follow the processing flow in [get_adata_cluster.py](get_adata_cluster.py) to analyse it for clustering.
 
-- All processed datasets and example datasets 1 can be downloaded at [Zenodo](https://zenodo.org/records/14741028) and [Synapse](https://www.synapse.org/Synapse:syn64421787/files/).
+- All processed datasets and example 'Dataset 1' can be downloaded at [Zenodo](https://zenodo.org/records/14741028) and [Synapse](https://www.synapse.org/Synapse:syn64421787/files/).
 
-The datasets structure should be as follows:
+The datasets should be organized in the following structure:
 ```
 |-- dataset
     |-- Dataset1
@@ -38,23 +38,24 @@ The datasets structure should be as follows:
 
 ## SpaIM Training and Testing
 
-Train all 53 datasets with one command
+Train all 53 datasets with a single command:
 ```
 chmod +x ./*
 ./run_SpaIM.sh
 ```
 
-The trained models and metric results are available in the defined folders:
+The trained models and metric results will be saved in the following directories:
 ```
-./SpaIM_results/Dataset1/  # for benchmark datasets
+./SpaIM_results/Dataset1/
 ```
 
 ## SpaIM Inference
 
+Run the following command to perform inference:
 ```
-python test_impiutation.py
+python test_imputation.py
 ```
-The inference results will exist in './SpaIM_results/Dataset1/impute_sc_result_%d.pkl'.
+The inference results will will be saved in './SpaIM_results/Dataset1/impute_sc_result_%d.pkl'.
 
 ## Acknowledgments
 
