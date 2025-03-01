@@ -57,6 +57,19 @@ python test_imputation.py
 ```
 The inference results will will be saved in './SpaIM_results/Dataset1/impute_sc_result_%d.pkl'.
 
+# Reference
+If you find this project is useful for your research, please cite:
+```
+@article{li2025spaim,
+  title={SpaIM: Single-cell Spatial Transcriptomics Imputation via Style Transfer},
+  author={Li, Bo and Tang, Ziyang and Budhkar, Aishwarya and Liu, Xiang and Zhang, Tonglin and Yang, Baijian and Su, Jing and Song, Qianqian},
+  journal={bioRxiv},
+  pages={2025--01},
+  year={2025},
+  publisher={Cold Spring Harbor Laboratory}
+}
+```
+
 ## Acknowledgments
 
 Our code is based on the [neural-style](https://github.com/jcjohnson/neural-style). Special thanks to the authors and contributors for their invaluable work.
