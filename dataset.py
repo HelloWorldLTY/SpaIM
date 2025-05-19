@@ -150,3 +150,112 @@ class ImputationDataset(Dataset):
         else: # c
             seq_x = self.seq_test.X[index, ...]
             return torch.FloatTensor(seq_x), st_style
+
+
+
+class Test_Imputation(Dataset):
+    def __init__(self, opt, istrain='val'):
+        self.opt = opt
+        print('opt.seq_data', opt.seq_data)
+        self.seq_adata = self.load_data(opt.seq_data)
+        print('shape', self.seq_adata.shape)
+
+        self.spa_data = self.load_data(opt.spa_data)  # 基因名
+
+        if 'leiden' in opt.cluster:
+            self.seq_cluster = self.seq_adata.obs[opt.cluster].cat.codes.values
+        elif opt.cluster == 'annotate':
+            self.seq_cluster = self.seq_adata.obs['merge_cell_type'].cat.codes.values  # 对应的是nano的设置，需要改 seq_data 的数据源
+        else:
+            self.seq_cluster = [1]
+
+        self.style_dim = opt.style_dim
+        self.istrain = istrain
+
+        self.seq_data = self.aggreate_cell_types(self.seq_adata)
+
+        # train_gene = np.load(os.path.join(opt.root, opt.dataset_name, 'train_list.npy'), allow_pickle=True).tolist()[opt.kfold] # 11 right
+        # test_gene = np.load(os.path.join(opt.root, opt.dataset_name, 'test_list.npy'), allow_pickle=True).tolist()[opt.kfold]
+        # val_gene = np.load(os.path.join(opt.root, opt.dataset_name, 'val_list.npy'), allow_pickle=True).tolist()[opt.kfold]
+
+        # some of the gene is filtered because of the low expression
+        # val_gene = list(set(val_gene) & set(self.seq_data.var.index) & set(self.spa_data.var.index))
+        # val_gene = list(set(val_gene) & set(self.seq_data.var.index))
+        val_gene = list(set(self.seq_data.var.index))
+
+        print('len(val_gene)', len(val_gene))  # 3482
+        # print(self.spa_train.shape, self.seq_train.shape)
+
+        self.seq_val = self.seq_data[:, val_gene].copy().T
+        print(self.seq_val)  #　AnnData object with n_obs × n_vars = 3482 × 6
+
+    def get_cluster_dim(self):
+        return len(set(self.seq_cluster))
+
+    def run_leiden(self):
+        adata_label = self.seq_data.copy()
+        sc.pp.highly_variable_genes(adata_label)
+        adata_label = adata_label[:, adata_label.var.highly_variable]
+        sc.pp.scale(adata_label, max_value=10)
+        # sc.pp.scale(adata_label)
+        sc.tl.pca(adata_label)
+        sc.pp.neighbors(adata_label)
+        sc.tl.leiden(adata_label, resolution=0.5)
+        # sc.tl.leiden(adata_label)
+        self.seq_data.obs['leiden'] = adata_label.obs['leiden']
+        # self.seq_data.write('dataset/nanostring/seq_all_cluster.h5ad')
+    
+    def get_eval_names(self):
+        return self.spa_data.obs_names, self.seq_adata.var_names
+    
+    def aggreate_cell_types(self, adata):
+        if 'leiden' in self.opt.cluster or self.opt.cluster == 'annotate': # True
+            # print('aggreate leiden or annotation')
+            x = adata.X
+            num_cls = len(set(self.seq_cluster))
+            new_x = np.zeros((num_cls, x.shape[1]))
+            for i in list(set(self.seq_cluster)):
+                new_x[i] = np.mean(x[self.seq_cluster == i], axis=0)
+            df = pd.DataFrame(new_x, columns=adata.var.index)
+            new_adata = sc.AnnData(df)
+            new_adata.var.index = adata.var.index
+            # print(new_adata.shape)  # (11, 17040)
+            return new_adata
+        else:
+            x = adata.X
+            new_x = np.zeros((1, x.shape[1]))
+            new_x[0] = np.mean(x, axis=0)
+            df = pd.DataFrame(new_x, columns=adata.var.index)
+            new_adata = sc.AnnData(df)
+            new_adata.var.index = adata.var.index
+            return new_adata
+
+    def load_data(self, root):
+        adata = sc.read(root)
+        sc.pp.filter_genes(adata, min_cells=3)
+        sc.pp.filter_cells(adata, min_genes=3)
+        # sc.pp.normalize_total(adata)
+        if not "log1p" in adata.uns_keys():
+            sc.pp.log1p(adata)
+        
+        # adata.var.index = adata.var.index.str.lower()
+        return adata
+    
+    def __len__(self):
+        if self.istrain == 'val':
+            return self.seq_val.shape[0]
+        else:
+            return self.seq_test.shape[0]
+    
+    def __getitem__(self, index):
+        st_style = torch.ones(self.style_dim)
+        sc_style = torch.zeros(self.style_dim)
+        
+        if self.istrain == 'val':
+            seq_x = self.seq_val.X[index, ...]
+            return torch.FloatTensor(seq_x), st_style
+        else:
+            print("Error in spx")
+            seq_x = self.seq_test.X[index, ...]
+            return torch.FloatTensor(seq_x), st_style
+
