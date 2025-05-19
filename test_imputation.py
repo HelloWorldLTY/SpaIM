@@ -4,7 +4,7 @@ import os
 import torch
 import sys
 from options import Options
-from dataset import ImputationDataset
+from dataset import Test_Imputation
 from tqdm import tqdm
 import numpy as np
 import scanpy as sc
@@ -13,7 +13,7 @@ import pandas as pd
 from utils import *
 from SpaIM import ImputeModule
 
-# 预测 SC 中存在但 ST 中确实的 Genes
+# 预测 SC 中存在但 ST 中缺失的 Genes
 opt = Options().parse()
 opt.kfold = 0 # 选择使用第几个fold的模型
 dataset = 'Dataset1'
@@ -28,7 +28,7 @@ SC_adata = sc.read(sc_path)
 
 print(ST_adata, '\n', SC_adata)
 
-valdataset = ImputationDataset(opt, istrain='val')
+valdataset = Test_Imputation(opt, istrain='val')
 
 gene_names, cell_names = valdataset.get_eval_names()
 
