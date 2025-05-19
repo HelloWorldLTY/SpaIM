@@ -54,7 +54,7 @@ model.load(model_path)
 with torch.no_grad():
     eval_result = None
     input_result = None
-    for i, (seq, st_style, _, _) in enumerate(valdataloader):
+    for i, (seq, st_style) in enumerate(valdataloader):
         inputs = {
             'scx': seq,
             'st_style': st_style
@@ -76,73 +76,3 @@ eval_result[eval_result <0] = 0
 # print(cell_names.shape)  # 检查 cell_names 的形状
 df1 = pd.DataFrame(eval_result, index=cell_names, columns=gene_names)
 df1.to_pickle(os.path.join(opt.save_path, 'impute_sc_result_%d.pkl'%(opt.kfold)))
-
-
-# # 读取数据，进行对比
-# adata = sc.read("./Insitu_count.h5ad")
-# SpaIM_adata1 = pd.read_pickle('./SpaIM/impute_sc_result_0.pkl')
-# Tangram_adata2 = pd.read_pickle('./Tangram/impute_sc_result_0.pkl')
-# StDiff_adata2 = pd.read_pickle("./StDiff/impute_sc_result_0.pkl")
-
-
-# # 提取表达矩阵
-# raw = adata.to_df()
-# spaim = SpaIM_adata1
-# stdiff = StDiff_adata2
-# tangram = Tangram_adata2
-
-# # 修改行名
-# raw.index = ['cell' + str(i) for i in range(1, len(raw) + 1)]
-# spaim.index = ['cell' + str(i) for i in range(1, len(spaim) + 1)]
-# stdiff.index = ['cell' + str(i) for i in range(1, len(stdiff) + 1)]
-# tangram.index = ['cell' + str(i) for i in range(1, len(tangram) + 1)]
-
-# # 修改列名
-# raw.columns = raw.columns.str.upper()
-# spaim.columns = spaim.columns.str.upper()
-# stdiff.columns = stdiff.columns.str.upper()
-# tangram.columns = tangram.columns.str.upper()
-
-# # 计算相关系数
-# genes = ['SOX4', 'TYK2', 'GPX1', 'EZH2']
-# for gene in genes:
-#     print(f"PCC between raw and spaim for gene {gene}:", np.corrcoef(raw[gene], spaim[gene])[0, 1])
-#     print(f"PCC between raw and stdiff for gene {gene}:", np.corrcoef(raw[gene], stdiff[gene])[0, 1])
-#     print(f"PCC between raw and tangram for gene {gene}:", np.corrcoef(raw[gene], tangram[gene])[0, 1])
-#     # print('\n')
-
-# # 读取数据
-# adata = sc.read("dataset/nano9-1/Insitu_count.h5ad")
-# SpaIM_adata1 = df1
-
-# # 提取表达矩阵
-# raw = adata.to_df()
-# spaim = SpaIM_adata1
-# # stdiff = StDiff_adata2.to_df()
-# # tangram = Tangram_adata2.to_df()
-
-# # 修改行名
-# raw.index = ['cell' + str(i) for i in range(1, len(raw) + 1)]
-# spaim.index = ['cell' + str(i) for i in range(1, len(spaim) + 1)]
-# # stdiff.index = ['cell' + str(i) for i in range(1, len(stdiff) + 1)]
-# # tangram.index = ['cell' + str(i) for i in range(1, len(tangram) + 1)]
-
-# # 修改列名
-# raw.columns = raw.columns.str.upper()
-# spaim.columns = spaim.columns.str.upper()
-# # stdiff.columns = stdiff.columns.str.upper()
-# # tangram.columns = tangram.columns.str.upper()
-
-# # 计算相关系数
-# genes = ['SOX4', 'TYK2', 'GPX1', 'EZH2']
-# for gene in genes:
-#     print(f"PCC between raw and spaim for gene {gene}:", np.corrcoef(raw[gene], spaim[gene])[0, 1])
-#     # print(f"PCC between raw and stdiff for gene {gene}:", np.corrcoef(raw[gene], stdiff[gene])[0, 1])
-#     # print(f"PCC between raw and tangram for gene {gene}:", np.corrcoef(raw[gene], tangram[gene])[0, 1])
-#     print('\n')
-
-
-
-
-
-
