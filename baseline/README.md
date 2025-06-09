@@ -1,8 +1,9 @@
 
 # Compared Methods  
 
-run test_pipeline.py(.test_pipeline.py), you will get Tangram, SpaGE, gimVI, and stPlus resluts. 
+Following the *SpatialBenchmarking* paper (https://github.com/QuKunLab/SpatialBenchmarking), we can obtain the `test_pipeline.py` for comparison. After running it, you will get the results of Tangram, SpaGE, gimVI, novoSpaRc, SpaOTsc, and stPlus. 
 
+For the other four comparison methods, spscope can be obtained by running `./test_spscope.py`. For the remaining three methods, you can go to the corresponding files and follow the instructions in the `README.md` for installation and inference.
 
 ## Data Sources and Code Availability  
 
