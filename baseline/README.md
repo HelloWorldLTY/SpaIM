@@ -13,8 +13,7 @@ For the other four comparison methods, spscope can be obtained by running [[test
 ### 1. Methods from the *SpatialBenchmarking* Paper  
 The code and data for the following methods can be found in the paper:  
 **《Benchmarking spatial and single-cell transcriptomics integration methods for transcript distribution prediction and cell type deconvolution》**  
-(https://github.com/QuKunLab/SpatialBenchmarking), including:  
-- **SpaGE**, **gimVI**, **novoSpaRc**, **stPlus**, **LIGER**, **Seurat**, **SpaOTsc**.  
+(https://github.com/QuKunLab/SpatialBenchmarking).
 
 ### 2. Recent Methods from Official Repositories  
 For newer methods, access their official GitHub repositories for code and data, and follow the `README` instructions to reproduce results:  
