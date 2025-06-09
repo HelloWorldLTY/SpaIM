@@ -1,25 +1,39 @@
-
 import warnings
 warnings.filterwarnings('ignore')
+import pickle
+import time as tm
+from functools import partial
+from scipy.stats import wasserstein_distance
+import scipy.stats
+import copy
+from sklearn.model_selection import KFold
+import multiprocessing
+import matplotlib as mpl 
+import matplotlib.pyplot as plt
+import scanpy as sc
+from scipy.spatial import distance_matrix
+from sklearn.metrics import matthews_corrcoef
+from scipy import stats
+import seaborn as sns
+from scipy.spatial.distance import cdist
+import h5py
+from scipy.stats import spearmanr
+import time
+import tangram as tg
+from IPython.display import display
 import numpy as np
-import pandas as pd
 import sys
 import os
 import scipy.stats as st
-import copy
-from sklearn.model_selection import KFold
 import pandas as pd
-import scanpy as sc
 from os.path import join
 import torch
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
 from sklearn.metrics import adjusted_mutual_info_score, adjusted_rand_score, homogeneity_score, normalized_mutual_info_score
-
-
 from stPlus import *
-import uniport as up
-
 import argparse
+
+
 parser = argparse.ArgumentParser(description='manual to this script')
 parser.add_argument("--sc_data", type=str, default="scRNA_count_cluster.h5ad")
 parser.add_argument("--sp_data", type=str, default='Insitu_count.h5ad')
@@ -51,7 +65,6 @@ sc_data = pd.DataFrame(data=data_seq_array, columns=sp_genes)
 # ****baseline****
 
 def Tangram_impute(annotate=None, modes='clusters', density='rna_count_based'):
-    import torch
     from torch.nn.functional import softmax, cosine_similarity, sigmoid
     import tangram as tg
     print('We run Tangram for this data\n')
@@ -209,6 +222,98 @@ def stPlus_impute():
     return all_pred_res
 
 
+def novoSpaRc_impute():
+    print ('We run novoSpaRc for this data\n')
+    import novosparc as nc
+    global RNA_data, Spatial_data, locations, train_gene, predict_gene
+    
+    global sc_data, sp_data, adata_seq, adata_spatial
+
+    raw_shared_gene = np.array(adata_spatial.var_names)
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state= args.rand)
+    kf.get_n_splits(raw_shared_gene)
+    torch.manual_seed(10)
+    idx = 1
+    all_pred_res = np.zeros_like(adata_spatial.X)
+    for train_list, test_list in kf.split(raw_shared_gene):
+        gene_names = np.array(RNA_data.index.values)
+        dge = RNA_data.values
+        dge = dge.T
+        num_cells = dge.shape[0]
+        print ('number of cells and genes in the matrix:', dge.shape)
+
+        hvg = np.argsort(np.divide(np.var(dge, axis = 0),np.mean(dge, axis = 0) + 0.0001))
+        dge_hvg = dge[:,hvg[-2000:]]
+
+        num_locations = locations.shape[0]
+
+        p_location, p_expression = nc.rc.create_space_distributions(num_locations, num_cells)
+        cost_expression, cost_locations = nc.rc.setup_for_OT_reconstruction(dge_hvg,locations,num_neighbors_source = 5,num_neighbors_target = 5)
+
+        insitu_matrix = np.array(Spatial_data[train_list])
+        insitu_genes = np.array(Spatial_data[train_list].columns)
+        test_genes = np.array(test_list)
+        test_matrix = np.array(Spatial_data[test_list])
+
+        markers_in_sc = np.array([], dtype='int')
+        for marker in insitu_genes:
+            marker_index = np.where(gene_names == marker)[0]
+            if len(marker_index) > 0:
+                markers_in_sc = np.append(markers_in_sc, marker_index[0])
+        cost_marker_genes = cdist(dge[:, markers_in_sc]/np.amax(dge[:, markers_in_sc]),insitu_matrix/np.amax(insitu_matrix))
+        alpha_linear = 0.5
+        gw = nc.rc._GWadjusted.gromov_wasserstein_adjusted_norm(cost_marker_genes, cost_expression, cost_locations,alpha_linear, p_expression, p_location,'square_loss', epsilon=5e-3, verbose=True)
+        sdge = np.dot(dge.T, gw)
+        imputed = pd.DataFrame(sdge,index = RNA_data.index)
+        result = imputed.loc[test_genes]
+        result = result.T        
+        all_pred_res[:, train_list] = result
+        idx += 1
+    return all_pred_res
+
+
+def SpaOTsc_impute():
+    from spaotsc import SpaOTsc
+    print ('We run SpaOTsc for this data\n')
+    global sc_data, sp_data, outdir, adata_spatial
+
+    raw_shared_gene = np.array(adata_spatial.var_names)
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=args.rand)
+    kf.get_n_splits(raw_shared_gene)
+    torch.manual_seed(10)
+    idx = 1
+    all_pred_res = np.zeros_like(adata_spatial.X)
+    for train_ind, test_ind in kf.split(raw_shared_gene):
+        df_sc = RNA_data.T
+        df_IS = Spatial_data
+        pts = locations
+        is_dmat = distance_matrix(pts, pts)
+        df_is = df_IS.loc[:,train_ind]
+
+        gene_is = df_is.columns.tolist()
+        gene_sc = df_sc.columns.tolist()
+        gene_overloap = list(set(gene_is).intersection(gene_sc))
+        a = df_is[gene_overloap]
+        b = df_sc[gene_overloap]
+
+        rho, pval = stats.spearmanr(a, b,axis=1)
+        rho[np.isnan(rho)]=0
+        mcc=rho[-(len(df_sc)):,0:len(df_is)]
+        C = np.exp(1 - mcc)
+        issc = SpaOTsc.spatial_sc(sc_data = df_sc, is_data = df_is, is_dmat = is_dmat)
+        issc.transport_plan(C**2, alpha = 0, rho = 1.0, epsilon = 0.1, cor_matrix = mcc, scaling = False)
+        gamma = issc.gamma_mapping
+        for j in range(gamma.shape[1]):
+            gamma[:,j] = gamma[:,j]/np.sum(gamma[:,j])
+        X_pred = np.matmul(gamma.T, np.array(issc.sc_data.values))
+        result = pd.DataFrame(data = X_pred, columns = issc.sc_data.columns.values)
+        all_pred_res[:, test_ind] = result
+        idx += 1
+
+    return all_pred_res
+
+
+
 Data = args.document
 outdir = 'Result/' + Data + '/baseline/'
 if not os.path.exists(outdir):
@@ -232,6 +337,16 @@ gimVI_result_pd.to_csv(outdir +  '/gimVI_impute.csv',header = 1, index = 1)
 stPlus_result = stPlus_impute() 
 stPlus_result_pd = pd.DataFrame(stPlus_result, columns=sp_genes)
 stPlus_result_pd.to_csv(outdir +  '/stPlus_impute.csv',header = 1, index = 1)
+
+
+novoSpaRc_result = novoSpaRc_impute()
+novoSpaRc_result_pd = pd.DataFrame(novoSpaRc_result, columns=sp_genes)
+novoSpaRc_result_pd.to_csv(outdir +  '/novoSpaRc_impute.csv',header = 1, index = 1)
+
+
+SpaOTsc_result = SpaOTsc_impute() 
+SpaOTsc_result_pd = pd.DataFrame(SpaOTsc_result, columns=sp_genes)
+SpaOTsc_result_pd.to_csv(outdir +  '/SpaOTsc_impute.csv',header = 1, index = 1)
 
 #******** metrics ********
 
