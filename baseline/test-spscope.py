@@ -10,7 +10,7 @@ import pandas as pd
 import scanpy as sc
 import torch
 import subprocess
-from baseline.SpatialScope.utils import ConcatCells
+from SpatialScope.utils import ConcatCells
 from sklearn.metrics import adjusted_mutual_info_score, adjusted_rand_score, homogeneity_score, normalized_mutual_info_score
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
 import torch
