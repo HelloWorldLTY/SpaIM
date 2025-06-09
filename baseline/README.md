@@ -1,7 +1,7 @@
 
 # Compared Methods  
 
-Our current code includes implementations of comparative methods such as **Tangram**, **gimVI**, **SpaGE**, **stPlus**, and **spatialscope**.  
+run test_pipeline.py(.test_pipeline.py), you will get Tangram, SpaGE, gimVI, and stPlus resluts. 
 
 
 ## Data Sources and Code Availability  
