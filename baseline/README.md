@@ -5,6 +5,9 @@ Following the *SpatialBenchmarking* [[paper](https://github.com/QuKunLab/Spatial
 
 For the other four comparison methods, spscope can be obtained by running [[test_spscope.py](./test_spscope.py)]. For the remaining three methods, you can go to the corresponding files and follow the instructions in the `README.md` for installation and inference.
 
+
+
+
 ## Data Sources and Code Availability  
 
 ### 1. Methods from the *SpatialBenchmarking* Paper  
