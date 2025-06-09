@@ -3,7 +3,7 @@
 
 Following the *SpatialBenchmarking* [[paper](https://github.com/QuKunLab/SpatialBenchmarking)], we can obtain the [[test_pipeline.py](./test-baseline.py)] for comparison. After running it, you will get the results of Tangram, SpaGE, gimVI, novoSpaRc, SpaOTsc, and stPlus. 
 
-For the other four comparison methods, spscope can be obtained by running [[test_spscope.py](./test_spscope.py)], SPRITE can be obtained by running [[test_TISSUE.py](./test_TISSUE.py)], SPRITE can be obtained by running [[test_sprite.py](./test_sprite.py)].
+For the other four comparison methods, spscope can be obtained by running [[test_spscope.py](./test_spscope.py)], SPRITE can be obtained by running [[test_TISSUE.py](./test_TISSUE.py)], SPRITE can be obtained by running [[test_sprite.py](./test_sprite.py)], and stDiff can be obtained by running [[test_stDiff.py](./test_stDiff.py)].
 
 
 
