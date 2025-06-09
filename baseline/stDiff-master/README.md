@@ -54,13 +54,3 @@ python test-stDiff.py --sc_data 'sc_dataset(h5ad)' --sp_data 'sp_dataset(h5ad)' 
 python test-baseline.py --sc_data 'sc_dataset(h5ad)' --sp_data 'sp_dataset(h5ad)' --document 'base_result_name'   
 ```
 Use ```bash run.sh``` run both methods
-
-
-### bug
-Error is reported on RTX 3070, 3090 GPUs, the reason is that the default torch=1.9.0 cuda version does not match the GPU, after installing with pip, try 
-```pip install torch==1.9.0+cu111 torchvision==0.10.0+cu111 torchaudio==0.9.0 -f https://download.pytorch.org/whl/torch_stable.html```
-```
-RuntimeError: CUDA error: no kernel image is available for execution on the device
-CUDA kernel errors might be asynchronously reported at some other API call,so the stacktrace below might be incorrect.
-For debugging consider passing CUDA_LAUNCH_BLOCKING=1.
-```
