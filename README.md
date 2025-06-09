@@ -3,7 +3,7 @@
 ## Single-cell Spatial Transcriptomics Imputation via Style Transfer  [[paper]](https://www.biorxiv.org/content/10.1101/2025.01.24.634756v1.full.pdf)
 
 We introduce SpaIM, a novel style transfer learning model that leverages scRNA-seq data to accurately impute unmeasured gene expressions in spatial transcriptomics (ST) data. SpaIM separates scRNA-seq and ST data into data-agnostic contents and data-specific styles, capturing commonalities and unique differences, respectively. By integrating scRNA-seq and ST strengths, SpaIM addresses data sparsity and limited gene coverage, outperforming existing methods across 53 diverse ST datasets. It also enhances downstream analyses like ligand-receptor interaction detection, spatial domain characterization, and differentially expressed gene identification.
-![workflow](./Fig1.png)
+![workflow](./data/Fig1.png)
 
 # Getting Started
 
@@ -22,7 +22,7 @@ conda activate SpaIM
 
 All datasets used in this study are publicly available. 
 
-- Data sources and details are provided in [`Supplemental_Table_1`](./Supplementary_Table_1.xlsx). After downloading the data, follow the processing flow in [get_adata_cluster.py](get_adata_cluster.py) to analyse it for clustering.
+- Data sources and details are provided in [`Supplemental_Table_1`](./data/Supplementary_Table_1.xlsx). After downloading the data, follow the processing flow in [get_adata_cluster.py](./data/get_adata_cluster.py) to analyse it for clustering.
 
 - All processed datasets and example 'Dataset 1' can be downloaded at [Zenodo](https://zenodo.org/records/14741028) and [Synapse](https://www.synapse.org/Synapse:syn64421787/files/).
 
@@ -53,6 +53,7 @@ The trained models and metric results will be saved in the following directories
 
 Run the following command to perform inference:
 ```
+cd test
 python test_imputation.py
 ```
 The inference results will will be saved in './SpaIM_results/Dataset1/impute_sc_result_%d.pkl'.
