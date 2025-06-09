@@ -16,7 +16,7 @@ torch.set_default_tensor_type('torch.cuda.FloatTensor')
 from sklearn.metrics import adjusted_mutual_info_score, adjusted_rand_score, homogeneity_score, normalized_mutual_info_score
 
 
-from baseline.stPlus import *
+from stPlus import *
 import uniport as up
 
 import argparse
