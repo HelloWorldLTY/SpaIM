@@ -313,6 +313,309 @@ def SpaOTsc_impute():
     return all_pred_res
 
 
+def TISSUE_impute():
+    print ('We run TISSUE for this data\n')
+    import tissue.main, tissue.downstream
+    from utils import CalculateMeteics
+    global sc_data, sp_data, adata_seq, adata_spatial
+    
+    raw_shared_gene = np.array(adata_spatial.var_names)
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state= args.rand)
+    kf.get_n_splits(raw_shared_gene)
+    torch.manual_seed(10)
+    idx = 1
+    all_pred_res = np.zeros_like(adata_spatial.X)
+
+    for train_ind, test_ind in kf.split(raw_shared_gene):
+        print("\n===== Fold %d =====\nNumber of train genes: %d, Number of test genes: %d" % (
+            idx, len(train_ind), len(test_ind)))
+        train_gene = raw_shared_gene[train_ind]
+        test_gene = raw_shared_gene[test_ind]
+        pv = len(train_gene) / 2
+        sp_data_partial = sp_data[train_gene]
+
+        # make genes lowercase
+        sp_data.var_names = [x.lower() for x in sp_data.var_names]
+        sc_data.var_names = [x.lower() for x in sc_data.var_names]
+
+        # preprocess RNAseq data
+        tissue.main.preprocess_data(sc_data, standardize=False, normalize=True)
+
+        # subset spatial data into shared genes
+        gene_names = np.intersect1d(sp_data.var_names, sc_data.var_names)
+        sp_data = sp_data[:, gene_names].copy()
+
+        # hold out target gene
+        target_gene = "plp1"
+        # target_expn = sp_data[:, target_gene].X.copy()
+        # target_gene = predict_gene[k]  #11　　＃　191
+        # print('predict_gene:', target_gene, len(target_gene))
+
+        sp_data = sp_data[:, [gene for gene in gene_names if gene != target_gene]].copy()
+
+        tissue.predict_gene_expression(sp_data, sc_data, [target_gene], method="tangram", n_folds=10, n_pv=10)
+        
+        Imp_Genes = sp_data.obsm['reinforced_gene_joint_tangram_predicted_expression']
+
+        all_pred_res[:, test_ind] = Imp_Genes
+        idx += 1
+
+    return all_pred_res
+
+
+def SPRITE_impute():
+    print ('We run SPRITE for this data\n')
+    global sc_data, sp_data, adata_seq, adata_spatial
+    import Baseline.sprite as sprite
+    raw_shared_gene = np.array(adata_spatial.var_names)
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state= args.rand)
+    kf.get_n_splits(raw_shared_gene)
+    torch.manual_seed(10)
+    idx = 1
+    all_pred_res = np.zeros_like(adata_spatial.X)
+
+    for train_ind, test_ind in kf.split(raw_shared_gene):
+        print("\n===== Fold %d =====\nNumber of train genes: %d, Number of test genes: %d" % (
+            idx, len(train_ind), len(test_ind)))
+        train_gene = raw_shared_gene[train_ind]
+        test_gene = raw_shared_gene[test_ind]
+        pv = len(train_gene) / 2
+        sp_data_partial = sp_data[train_gene]
+
+        # make genes lowercase
+        sp_data.var_names = [x.lower() for x in sp_data.var_names]
+        sc_data.var_names = [x.lower() for x in sc_data.var_names]
+
+        # preprocess RNAseq data
+        sprite.preprocess_data(sc_data, standardize=False, normalize=True)
+
+        # subset spatial data into shared genes
+        gene_names = np.intersect1d(sp_data.var_names, sc_data.var_names)
+        sp_data = sp_data[:, gene_names].copy()
+
+        # hold out target gene
+        target_gene = "plp1"
+        # target_expn = sp_data[:, target_gene].X.copy()
+        # target_gene = predict_gene[k]  #11　　＃　191
+        # print('predict_gene:', target_gene, len(target_gene))
+
+        sp_data = sp_data[:, [gene for gene in gene_names if gene != target_gene]].copy()
+
+        sprite.predict_gene_expression(sp_data, sc_data, [target_gene], method="tangram", n_folds=10, n_pv=10)
+        
+        sprite.reinforce_gene(sp_data, predicted="tangram_predicted_expression",
+                                    alpha=0.1, tol=1e-8, cv=5)
+
+        # build spatial neighborhood graph
+        sprite.build_spatial_graph(sp_data, method="fixed_radius", n_neighbors=50)
+
+        # calculate cosine-based weights for edges
+        sprite.calc_adjacency_weights(sp_data, method="cosine")
+
+        # Smooth
+        sprite.smooth(sp_data, predicted="reinforced_gene_joint_tangram_predicted_expression",
+                    alpha=0.1, tol=1e-8)
+        Imp_Genes = sp_data.obsm['reinforced_gene_joint_tangram_predicted_expression']
+
+        all_pred_res[:, test_ind] = Imp_Genes
+        idx += 1
+
+    return all_pred_res
+
+
+def StDiff_impute():
+    print ('We run StDiff for this data\n')
+    sys.path.append("baseline/StDiff-master/")
+    from model.stDiff_model import DiT_stDiff
+    from model.stDiff_scheduler import NoiseScheduler
+    from model.stDiff_train import normal_train_stDiff
+    from model.sample import sample_stDiff
+    from process.result_analysis import clustering_metrics
+    from process.data import *
+    import resource
+    
+    global sc_data, sp_data, adata_seq, adata_spatial
+
+    raw_shared_gene = np.array(adata_spatial.var_names)
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state= args.rand)
+    kf.get_n_splits(raw_shared_gene)
+    torch.manual_seed(10)
+    idx = 1
+    all_pred_res = np.zeros_like(adata_spatial.X)
+    for train_ind, test_ind in kf.split(raw_shared_gene):
+        print("\n===== Fold %d =====\nNumber of train genes: %d, Number of test genes: %d" % (
+            idx, len(train_ind), len(test_ind)))
+
+
+        doc =args.document # 'Dataset11_std+scale_new'
+        save_path = 'stDiff-ckpt/' + doc + '/'
+        if not os.path.exists(save_path):
+            os.makedirs(save_path)
+        save_path_prefix = save_path + 'stDiff%d.pt' % (idx)
+        
+        
+        # mask
+        cell_num = data_spatial_array.shape[0]
+        gene_num = data_spatial_array.shape[1]
+        mask = np.ones((gene_num,), dtype='float32')
+        gene_ids_test = test_ind
+        mask[gene_ids_test] = 0
+
+        seq = data_seq_array
+        st = data_spatial_array
+        data_seq_masked = seq * mask
+        data_spatial_masked = st * mask
+
+        seq = seq * 2 - 1
+        data_seq_masked = data_seq_masked * 2 - 1
+
+        data_ary = data_spatial_array
+        st = st * 2 - 1
+        data_spatial_masked = data_spatial_masked * 2 - 1
+
+        dataloader = get_data_loader(
+            seq,
+            data_seq_masked,
+            batch_size=512,
+            is_shuffle=True)
+
+        seed = 1202
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
+        torch.cuda.manual_seed_all(seed)
+
+        model = DiT_stDiff(
+            input_size=gene_num,
+            hidden_size=512,
+            depth=8,
+            num_heads=4,
+            classes=6,
+            mlp_ratio=4.0,
+            dit_type='dit'
+        )
+
+        device = torch.device('cuda:0')
+        model.to(device)
+
+        diffusion_step = diffusion_step
+
+        model.train()
+
+        # 计时开始
+        start_time = time.time()
+        # 记录开始时的资源使用情况
+        start_resources = resource.getrusage(resource.RUSAGE_SELF)
+
+        # if not os.path.isfile(save_path_prefix):
+
+        normal_train_stDiff(model,
+                                dataloader=dataloader,
+                                lr=0.001,
+                                num_epoch=800,
+                                diffusion_step=diffusion_step,
+                                device=device,
+                                pred_type='noise',
+                                mask=mask)
+
+        torch.save(model.state_dict(), save_path_prefix)
+        # else:
+        #     print("No pretrained model")
+            # model.load_state_dict(torch.load(save_path_prefix))
+        
+        # 计时结束
+        end_time = time.time()
+
+        # 记录结束时的资源使用情况
+        end_resources = resource.getrusage(resource.RUSAGE_SELF)
+
+        # 计算总训练时间
+        training_time = end_time - start_time
+        print(f"Total training time: {training_time:.2f} seconds")
+
+        # 计算资源消耗
+        cpu_time = end_resources.ru_utime - start_resources.ru_utime
+        max_memory_used = end_resources.ru_maxrss / 1024  # 转换为MB
+        # print(f"CPU time used: {cpu_time:.2f} seconds")
+        print(f"Maximum memory used: {max_memory_used:.2f} MB")
+
+
+        gt = data_spatial_masked
+        noise_scheduler = NoiseScheduler(
+            num_timesteps=diffusion_step,
+            beta_schedule='cosine'
+        )
+
+        dataloader = get_data_loader(
+            data_spatial_masked,
+            data_spatial_masked,
+            batch_size=40,
+            is_shuffle=False)
+
+        # sample
+        model.eval()
+        imputation = sample_stDiff(model,
+                                    device=device,
+                                    dataloader=dataloader,
+                                    noise_scheduler=noise_scheduler,
+                                    mask=mask,
+                                    gt=gt,
+                                    num_step=diffusion_step,
+                                    sample_shape=(cell_num, gene_num),
+                                    is_condi=True,
+                                    sample_intermediate=diffusion_step,
+                                    model_pred_type='noise',
+                                    is_classifier_guidance=False,
+                                    omega=0.2)
+
+        all_pred_res[:, gene_ids_test] = imputation[:, gene_ids_test]
+        idx += 1
+
+    impu = (all_pred_res + 1) / 2
+    cpy_x = adata_spatial.copy()
+    cpy_x.X = impu
+    return impu
+
+
+def spscope_impute():
+    from SpatialScope.utils import ConcatCells
+    
+    raw_shared_gene = np.array(adata_spatial.var_names)
+    kf = KFold(n_splits=n_splits, shuffle=True, random_state=args.rand)
+    kf.get_n_splits(raw_shared_gene)
+    torch.manual_seed(10)
+    idx = 1
+    
+    all_pred_res = np.zeros((len(a), adata_spatial.X.shape[1]))
+    
+    total_size = adata_spatial.X.shape[0]
+    chunk_size = 1000
+    arr = [(start, min(start + chunk_size, total_size)) for start in range(0, total_size, chunk_size)]
+
+    
+    for train_ind, test_ind in kf.split(raw_shared_gene):
+        print("\n===== Fold %d =====\nNumber of train genes: %d, Number of test genes: %d" % (
+            idx, len(train_ind), len(test_ind)))
+        train_gene = np.array(raw_shared_gene[train_ind])
+        test_gene = np.array(raw_shared_gene[test_ind])
+        test_gene_str = ','.join(test_gene)
+
+        
+        for i in arr:
+            print(f"{i[0]},{i[1]}")
+            decomposition = ['python', './baseline/SpatialScope/Decomposition.py', '--tissue', dataset, '--out_dir', './spscope_output/' + dataset,
+                        '--SC_Data', './ckpt/sc/' + dataset_sp + '_spscope.h5ad', '--cell_class_column', 'subclass_label',  '--ckpt_path', 'ckpt/' + dataset + '/model_05000.pt',
+                        '--spot_range', f"{i[0]},{i[1]}", '--replicates', '5', '--gpu', '1', '--leave_out_test', '--test_genes', f'{test_gene_str}']
+            subprocess.run(decomposition)
+        
+        spot_range = np.concatenate((np.arange(0,total_size,chunk_size), np.array([total_size])))
+        ad_res = ConcatCells(spot_range,file_path='./spscope_output/' + dataset + '/' + dataset + '/',prefix='generated_cells_spot',suffix='.h5ad')
+
+        all_pred_res[:, test_ind] = ad_res.X[:, test_ind]
+        idx += 1
+        
+
+    return all_pred_res
+
 
 Data = args.document
 outdir = 'Result/' + Data + '/baseline/'
@@ -347,6 +650,27 @@ novoSpaRc_result_pd.to_csv(outdir +  '/novoSpaRc_impute.csv',header = 1, index =
 SpaOTsc_result = SpaOTsc_impute() 
 SpaOTsc_result_pd = pd.DataFrame(SpaOTsc_result, columns=sp_genes)
 SpaOTsc_result_pd.to_csv(outdir +  '/SpaOTsc_impute.csv',header = 1, index = 1)
+
+
+TISSUE_result = TISSUE_impute()
+TISSUE_result_pd = pd.DataFrame(TISSUE_result, columns=sp_genes)
+TISSUE_result_pd.to_csv(outdir +  '/TISSUE_impute.csv',header = 1, index = 1)
+
+
+SPRITE_result = SPRITE_impute() 
+SPRITE_result_pd = pd.DataFrame(SPRITE_result, columns=sp_genes)
+SPRITE_result_pd.to_csv(outdir +  '/SPRITE_impute.csv',header = 1, index = 1)
+
+
+StDiff_result = StDiff_impute() 
+StDiff_result_pd = pd.DataFrame(StDiff_result, columns=sp_genes)
+StDiff_result_pd.to_csv(outdir +  '/StDiff_impute.csv',header = 1, index = 1)
+    
+
+spscope_result = spscope_impute() 
+spscope_result_pd = pd.DataFrame(spscope_result, columns=sp_genes)
+spscope_result_pd.to_csv(outdir +  '/spscope_impute.csv',header = 1, index = 1)
+
 
 #******** metrics ********
 
@@ -624,3 +948,5 @@ def CalDataMetric(Data):
         medians.to_csv(outdir +  '/final_result.csv',header = 1, index = 1)
 
 CalDataMetric(Data)
+
+
