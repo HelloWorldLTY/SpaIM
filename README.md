@@ -54,7 +54,7 @@ The trained models and metric results will be saved in the following directories
 Run the following command to perform inference:
 ```
 cd test
-python test_imputation.py
+python SpaIM_imputation.py
 ```
 The inference results will will be saved in './SpaIM_results/Dataset1/impute_sc_result_%d.pkl'.
 
