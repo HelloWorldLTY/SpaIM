@@ -1,4 +1,5 @@
 # SpaIM
+[![DOI](https://zenodo.org/badge/801848419.svg)](https://doi.org/10.5281/zenodo.16688132)
 
 ## Single-cell Spatial Transcriptomics Imputation via Style Transfer  [[paper]](https://www.biorxiv.org/content/10.1101/2025.01.24.634756v1.full.pdf)
 
