@@ -22,7 +22,7 @@ conda activate SpaIM
 
 All datasets used in this study are publicly available. 
 
-- Data sources and details are provided in [`Supplementary_Table_1`](./data/Supplementary_Table_1.xlsx). After downloading the data, follow the processing flow in [Data Processing.py](./data/Data_processing_cluster.py) to analyse it for clustering.
+Data sources and detailed information are provided in [`Supplementary_Table_1`](./data/Supplementary_Table_1.xlsx). After downloading the data, please refer to the processing steps outlined in [Data Processing README.txt](./data/Data_Processing_README.txt) and execute the code in [Data Processing.py](./data/Data_Processing.py) to perform the analysis and obtain clustering results.
 
 - All processed datasets can be downloaded at [Zenodo](https://zenodo.org/records/14741028) and [Synapse](https://www.synapse.org/Synapse:syn64421787/files/).
 
