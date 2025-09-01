@@ -62,14 +62,8 @@ The inference results will will be saved in './SpaIM_results/Dataset1/impute_sc_
 # Reference
 If you find this project is useful for your research, please cite:
 ```
-@article{li2025spaim,
-  title={SpaIM: Single-cell Spatial Transcriptomics Imputation via Style Transfer},
-  author={Li, Bo and Tang, Ziyang and Budhkar, Aishwarya and Liu, Xiang and Zhang, Tonglin and Yang, Baijian and Su, Jing and Song, Qianqian},
-  journal={bioRxiv},
-  pages={2025--01},
-  year={2025},
-  publisher={Cold Spring Harbor Laboratory}
-}
+Li, B., Tang, Z., Budhkar, A. et al. SpaIM: single-cell spatial transcriptomics imputation via style transfer. Nat Commun 16, 7861 (2025). https://doi.org/10.1038/s41467-025-63185-9
+
 ```
 
 ## Acknowledgments
